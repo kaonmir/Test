@@ -111,7 +111,7 @@ palloc_get_multiple (enum palloc_flags flags, size_t page_cnt)
       page_idx = BITMAP_ERROR;
   }
   else
-    PANIC("Cannot find any appropriate pallocator."); // TODO
+    PANIC("Cannot find any appropriate pallocator.");
 
   lock_release (&pool->lock);
 
@@ -226,3 +226,7 @@ page_from_pool (const struct pool *pool, void *page)
   return page_no >= start_page && page_no < end_page;
 }
 
+struct bitmap *get_kernel_usedmap ()
+{
+	return kernel_pool.used_map;
+}

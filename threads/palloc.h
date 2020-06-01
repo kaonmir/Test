@@ -29,4 +29,9 @@ void palloc_free_page (void *);
 void palloc_free_multiple (void *, size_t page_cnt);
 void palloc_get_status (enum palloc_flags flags);
 
+
+#ifndef NDEBUG
+struct bitmap *get_kernel_usedmap ();
+#endif
+
 #endif /* threads/palloc.h */

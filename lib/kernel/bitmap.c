@@ -315,14 +315,14 @@ bitmap_best (struct bitmap *b, size_t start, size_t cnt, bool value)
   ASSERT (b != NULL);
   ASSERT (start <= b->bit_cnt);
   
-  size_t min_size = SIZE_MAX;
+  size_t min_size = bitmap_size(b) + 1;
   size_t min_idx = BITMAP_ERROR;
   
   size_t last = b->bit_cnt - cnt;
   size_t i, size;
   for (i = start; i < last; i+=size)
   {
-    size = bitmap_through (b, start, value);
+    size = bitmap_through (b, i, value);
     if (size == 0)
       i++;
     else if (size >= cnt && size < min_size)
@@ -428,8 +428,8 @@ bitmap_dump2 (const struct bitmap *b)
   for (i=0; i<elem_cnt (b->bit_cnt); i++) {
     for (j=0; j<ELEM_BITS; j++) {
       if ((i * ELEM_BITS + j) < b->bit_cnt) {
-        printf ("%u", (unsigned int) (b->bits[i] >> j) & 0x1);
-      }      
+        printf ("%u", (unsigned int) (b->bits[i] >> j) & 0x1);\
+      }  
     }
     printf ("\n");
   }
