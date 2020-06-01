@@ -31,6 +31,7 @@ struct pool
     struct lock lock;                   /* Mutual exclusion. */
     struct bitmap *used_map;            /* Bitmap of free pages. */
     uint8_t *base;                      /* Base of pool. */
+	size_t pin;							/* pin address of Next Fit */
   };
 
 /* Two pools: one for kernel data, one for user pages. */
@@ -81,7 +82,37 @@ palloc_get_multiple (enum palloc_flags flags, size_t page_cnt)
     return NULL;
 
   lock_acquire (&pool->lock);
-  page_idx = bitmap_scan_and_flip (pool->used_map, 0, page_cnt, false); // 실제 할당하는 과정
+  
+  struct bitmap *used_map = pool->used_map;
+  
+  if(pallocator == ALLOCATOR_FF) 
+	  page_idx = bitmap_scan_and_flip (used_map, 0, page_cnt, false);
+  else if (pallocator == ALLOCATOR_NF)
+  {
+    page_idx = bitmap_scan_and_flip (used_map, pool->pin, page_cnt, false);
+    if (page_idx == BITMAP_ERROR)
+		page_idx = bitmap_scan_and_flip (used_map, 0, page_cnt, false);
+    pool->pin = page_idx;
+  }
+  else if (pallocator == ALLOCATOR_BF)
+    page_idx = bitmap_best (used_map, 0, page_cnt, false);
+  else if (pallocator == ALLOCATOR_BUDDY)
+  {
+    size_t size;
+    for (size = 1; size < bitmap_size(used_map); size*=2)
+      if (page_cnt <= size)
+        break;
+    for (page_idx = 0; page_idx < bitmap_size(used_map); page_idx+=size)
+      if (bitmap_none(used_map, page_idx, size))
+        break;	
+	if (page_idx < bitmap_size(used_map))
+      bitmap_set_multiple (used_map, page_idx, page_cnt, true);
+	else
+      page_idx = BITMAP_ERROR;
+  }
+  else
+    PANIC("Cannot find any appropriate pallocator."); // TODO
+
   lock_release (&pool->lock);
 
   if (page_idx != BITMAP_ERROR)

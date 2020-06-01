@@ -288,6 +288,55 @@ bitmap_all (const struct bitmap *b, size_t start, size_t cnt)
 
 /* Finding set or unset bits. */
 
+/* Finds the size of first consecutive bits in B
+   starting at START that are all set to VALUE.
+   If there is no such group, return BITMAP_ERROR. */
+size_t
+bitmap_through (const struct bitmap *b, size_t start, bool value)
+{
+  ASSERT (b != NULL);
+  ASSERT (start <= b->bit_cnt);
+  
+  size_t last = b->bit_cnt;
+  size_t i;
+  for (i = start; i < last; i++)
+    if (bitmap_test (b, i) != value)
+      break;
+  return i - start;
+}
+
+/* Finds and returns the starting index of the best group of CNT
+   consecutive bits in B at or after START that are all set to
+   VALUE.
+   If there is no such group, returns BITMAP_ERROR. */
+size_t
+bitmap_best (struct bitmap *b, size_t start, size_t cnt, bool value) 
+{
+  ASSERT (b != NULL);
+  ASSERT (start <= b->bit_cnt);
+  
+  size_t min_size = SIZE_MAX;
+  size_t min_idx = BITMAP_ERROR;
+  
+  size_t last = b->bit_cnt - cnt;
+  size_t i, size;
+  for (i = start; i < last; i+=size)
+  {
+    size = bitmap_through (b, start, value);
+    if (size == 0)
+      i++;
+    else if (size >= cnt && size < min_size)
+    {
+      min_size = size;
+      min_idx = i;
+    }
+  }
+  
+  if (min_idx != BITMAP_ERROR)
+    bitmap_set_multiple (b, min_idx, cnt, !value);
+  return min_idx;
+}
+
 /* Finds and returns the starting index of the first group of CNT
    consecutive bits in B at or after START that are all set to
    VALUE.

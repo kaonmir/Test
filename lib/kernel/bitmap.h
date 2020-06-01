@@ -34,6 +34,8 @@ bool bitmap_all (const struct bitmap *, size_t start, size_t cnt);
 
 /* Finding set or unset bits. */
 #define BITMAP_ERROR SIZE_MAX
+size_t bitmap_through (const struct bitmap *, size_t start, bool);
+size_t bitmap_best (struct bitmap *, size_t start, size_t cnt, bool);
 size_t bitmap_scan (const struct bitmap *, size_t start, size_t cnt, bool);
 size_t bitmap_scan_and_flip (struct bitmap *, size_t start, size_t cnt, bool);
 
