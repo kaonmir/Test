@@ -8,4 +8,4 @@ jobs:
 
       # 'npm install' will be executed with 'jest-action'
       - name: Run Jest
-        uses: stefanoeb/jest-action@23.5.0
+        uses: stefanoeb/jest-action@1.0.4
