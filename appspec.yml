@@ -7,5 +7,5 @@ files:
     destination: /home/ec2-user/build # destination은 instance(EC2) 기준
 hooks:
   BeforeInstall:
-    - location: __github__/beforeInstsall.bash
+    - location: /__github__/beforeInstsall.bash
       runas: root
