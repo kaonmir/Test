@@ -5,7 +5,3 @@ files:
 # source가 destination안에 복사됨
   - source: /  # source는 프로젝트(github) 기준
     destination: /home/ec2-user/build # destination은 instance(EC2) 기준
-hooks:
-  BeforeInstall:
-    - location: /__github__/beforeInstsall.bash
-      runas: root
